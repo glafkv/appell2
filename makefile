@@ -1,17 +1,15 @@
 CC	= gcc
-CFLAGS	= -g
-TARGET	= oss
-OBJS	= oss.o user.o
+CFLAGS 	= -g
 
-$(TARGET): $(OBJS)
-	   $(CC) -o $(TARGET) $(OBJS)
+all: oss user
 
-oss.o:	oss.c
-	$(CC) $(CFLAGS) -c oss.c
+oss:	oss.c
+	$(CC) -o oss oss.c
 
-user.o: user.c
-	 $(CC) $(CFLAGS) -c user.c
+user:	user.c
+	$(CC) -o user user.c
 
 .PHONY:	clean
 clean:
-	/bin/rm -f *.o $(TARGET)
+	/bin/rm -f *.o *~ oss
+	/bin/rm -f *.o *~ user

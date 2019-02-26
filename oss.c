@@ -15,37 +15,9 @@ int main(int argc, char *argv[])
 	char * s = NULL;
 	opterr = 0;
 
-	int shmId, i;
 	key_t key;
-	int *shmPtr;
-	const int SIZE = 10;
-	key = ftok("./", 100);
-	if((shmId = shmget(key, SIZE*sizeof(int), IPC_CREAT|0666))<0){
-		printf("smget failed in server\n");
-		exit(1);
-	}
-	if((shmPtr = (int *) shmat(shmId, NULL, 0)) == -1){
-		printf("shmat failed in server\n");
-		exit(2);
-	}
-	for(i = 0; i < SIZE; i++)
-		shmPtr[i] = 0;
-	
-	printf("server has zeroed array\n");
-	int totalZeros = SIZE;
-	while(totalZeros == SIZE){
-		totalZeros=0;
-		for(i=0;i<SIZE; i++){
-			if(shmPtr[i]==0)
-				totalZeros++;
-		}
-	}
-	printf("client has filled array with fibs\n");
-	for(i=0; i<SIZE; i++)
-		printf("%d", shmPtr[i]);
-		
-	shmdt(shmPtr);
-	shmctl(shmId, IPC_RMID, NULL);
+	key = ftok(".", 'x');
+	printf("key in master %d\n", key);
 	
 
 	/*while((choice = getopt(argc, argv, "hn:s:i:o:")) != -1){
