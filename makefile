@@ -1,7 +1,7 @@
 CC	= gcc
 CFLAGS	= -g
 TARGET	= oss
-OBJS	= oss.o timer.o
+OBJS	= oss.o user.o
 
 $(TARGET): $(OBJS)
 	   $(CC) -o $(TARGET) $(OBJS)
@@ -9,8 +9,8 @@ $(TARGET): $(OBJS)
 oss.o:	oss.c
 	$(CC) $(CFLAGS) -c oss.c
 
-timer.o: timer.c
-	 $(CC) $(CFLAGS) -c timer.c
+user.o: user.c
+	 $(CC) $(CFLAGS) -c user.c
 
 .PHONY:	clean
 clean:
