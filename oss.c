@@ -39,37 +39,8 @@ int main(int argc, char *argv[])
 	//char * n = NULL;
 	//char * s = NULL;	
 	
-	/*int shmId, i;
-	key_t key;
-	int *shmPtr;
-	const int SIZE = 10;
-	if((shmId = shmget(IPC_PRIVATE, sizeof(int)*SIZE, IPC_CREAT | 0666)) < 0){
-	printf("shmget failed in parent\n");
-	exit(1);
-	}
-	if((shmPtr = (int *) shmat( shmId, NULL, 0)) == -1){
-		printf("shmat failed in parent\n");
-		exit(2);
-	}
-	for(i = 0; i < SIZE; i++){
-		shmPtr[i] = 0;
-	}
-	printf("Parent has zeroed array\n");
-	int pid = fork();
-	if(pid == 0){
-		printf("In child, now we will rock some fibs\n");
-		shmPtr[0] = shmPtr[1] = 1;
-		for(i = 2; i < SIZE; i++){
-			shmPtr[i] = shmPtr[i-1] + shmPtr[i-2];
-		}
-	exit(0);
-	}
-	wait(&i);
-	for(i = 0; i < SIZE; i++){
-		printf("%d ", shmPtr[i]);
-	}
-	shmdt(shmPtr);
-	shmctl(shmId, IPC_RMID, NULL);*/
+	
+	
 
 
 	
