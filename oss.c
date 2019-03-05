@@ -20,25 +20,38 @@ void terminate(int sig){
 }
 int main(int argc, char *argv[])
 {
+	//Shared memory stuff.
 	key_t key;
 	char *shm;
 	char *s;
 	key = 9876;
+	//Child pid
 	pid_t childpid = 0; 
+	//variables
 	int i = 0, j = 0, shmid = 0, total = 0, done, n, s;
 	opterr = 0;
 	int arr[2];
+	char *infile;
+	char *outfile;
+	
+	//default values for the files.
+	infile = "input.txt";
+	outfile = "output.txt";
+	//Opens the files
+	FILE *infptr = fopen(infile, "r");
+	FILE *outfptr = fopen(outfile, "a");
+	
 	shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
 	
 	
 	(void)signal(SIGNINT, terminate);
 	if(shmid < 0){
-		perror("shmget");
+		perror("shmget: ");
 		exit(1);
 	}
 	shm = shmat(shmid, NULL, 0);
 	if(shm == (char *) -1){
-		perror("shmat");
+		perror("shmat: ");
 		exit(1);
 	}
 	
@@ -53,9 +66,18 @@ int main(int argc, char *argv[])
 	shmdt(shm);
 	shmctl(shmid, IPC_RMID, NULL);
 	int choice = 0;
-	char * n = NULL;
-	char * s = NULL;	
+	char * nval = NULL;
+	char * sval = NULL;	
 	
+	if(infptr == NULL){
+		perror("oss.c: Error: ");
+		exit(EXIT_FAILURE);
+	}
+	if(outfptr == NULL){
+		perror("oss.c: Error: ");
+		exit(EXIT_FAILURE);
+	}
+
 	
 	
 
@@ -76,16 +98,16 @@ int main(int argc, char *argv[])
 				printf("-o outputfile : indicate the name of your output file. The default is output.txt\n");
 				exit(0);
 			case 's':
-				s = optarg;
+				sval = optarg;
 				break;
 			case 'n':
-				n = optarg;
+				nval = optarg;
 				break;
 			case 'i':
-				i = optarg;
+				infile = optarg;
 				break;
 			case 'o':
-				o = optarg;
+				outfilee = optarg;
 				break;
 			case '?':
 				if(optopt == 'n'){
@@ -118,7 +140,8 @@ int main(int argc, char *argv[])
 
 
 
-
+fclose(infptr);
+fclose(outfptr);
 
 return 0;
 }
