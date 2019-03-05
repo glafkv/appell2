@@ -12,79 +12,34 @@
 
 #define SHSIZE 100
 
-int shm_id;
-void terminate(int sig){
-	printf("Control C was pressed. Press Control C again to terminate\n");
-	shmctl(shm_id, IPC_RMID, NULL);
-	(void)signal(SIGNT, SIG_DFL);
-}
 int main(int argc, char *argv[])
 {
-	//Shared memory stuff.
-	key_t key;
-	char *shm;
-	char *s;
-	key = 9876;
+
 	//Child pid
 	pid_t childpid = 0; 
 	//variables
-	int i = 0, j = 0, shmid = 0, total = 0, done, n, s;
+	int i = 0;
 	opterr = 0;
 	int arr[2];
 	char *infile;
 	char *outfile;
-	
 	//default values for the files.
 	infile = "input.txt";
 	outfile = "output.txt";
 	//Opens the files
 	FILE *infptr = fopen(infile, "r");
 	FILE *outfptr = fopen(outfile, "a");
-	
-	shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
-	
-	
-	(void)signal(SIGNINT, terminate);
-	if(shmid < 0){
-		perror("shmget: ");
-		exit(1);
-	}
-	shm = shmat(shmid, NULL, 0);
-	if(shm == (char *) -1){
-		perror("shmat: ");
-		exit(1);
-	}
-	
-	memcpy(shm, "Hello world", 11);
-	
-	s = shm;
-	s += 11;
-	*s = 0;
-	while(*shm != '*'){
-		sleep(1);	
-	}
-	shmdt(shm);
-	shmctl(shmid, IPC_RMID, NULL);
+	//For case statement
 	int choice = 0;
 	char * nval = NULL;
 	char * sval = NULL;	
-	
-	if(infptr == NULL){
-		perror("oss.c: Error: ");
-		exit(EXIT_FAILURE);
-	}
-	if(outfptr == NULL){
-		perror("oss.c: Error: ");
-		exit(EXIT_FAILURE);
-	}
-
+	//variables to allocate shared memory.
+	int shmid;
+	key_t key;
+	char *shm;
+	char *s;
 	
 	
-
-	if(argc < 4){
-		fprintf(stderr, "Process %s requires additional arguments\n",argv[0]);
-		return 1;
-	}
 	
 	while((choice = getopt(argc, argv, "hn:s:i:o:")) != -1){
 		switch(choice){
@@ -99,7 +54,7 @@ int main(int argc, char *argv[])
 				exit(0);
 			case 's':
 				sval = optarg;
-				break;
+				
 			case 'n':
 				nval = optarg;
 				break;
@@ -107,7 +62,7 @@ int main(int argc, char *argv[])
 				infile = optarg;
 				break;
 			case 'o':
-				outfilee = optarg;
+				outfile = optarg;
 				break;
 			case '?':
 				if(optopt == 'n'){
@@ -123,19 +78,35 @@ int main(int argc, char *argv[])
 				abort();
 		}
 	}
-
-	if(strcmp(argv[3],"-n") == 0){
-		n = atoi(argv[4]);	
+	if(argc < 4){
+		fprintf(stderr, "%s requires additional arguments\n", argv[0]);
+		return 1;
+	}
+	if(strcmp(argv[3], "-s" == 0)){
+		n = atoi(argv[2]);
+		s = atoi(argv[4]);	
+	}
+	else {
+		n = atoi(argv[4]);
 		s = atoi(argv[2]);
 	}
-	else{
-		n = atoi(argv[2]);
-		s = atoi(argv[4]);
-	}
 	if(s > 20){
-		printf("Too many children. Defaulting to 20.\n");
+		printf("Too many children. Now it's 20.");
 		s = 20;
 	}
+		
+	key = 9876;
+	shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
+	if(shmid < 0){
+		perror("shmget: ");
+		exit(1);
+	}
+	shm = shmat(shmid, NULL, 0);
+	if(shm == (char *) -1){
+		perror("shmat: ");
+		exit(1);
+	}
+	
 
 
 
