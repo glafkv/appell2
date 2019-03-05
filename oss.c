@@ -59,7 +59,10 @@ int main(int argc, char *argv[])
 	
 	
 
-
+	if(argc < 4){
+		fprintf(stderr, "Process %s requires additional arguments\n",argv[0]);
+		return 1;
+	}
 	
 	while((choice = getopt(argc, argv, "hn:s:i:o:")) != -1){
 		switch(choice){
@@ -78,15 +81,39 @@ int main(int argc, char *argv[])
 			case 'n':
 				n = optarg;
 				break;
+			case 'i':
+				i = optarg;
+				break;
+			case 'o':
+				o = optarg;
+				break;
 			case '?':
-				fprintf(stderr, "Not an option.\n");
+				if(optopt == 'n'){
+					fprintf(stderr, "-n requires an accompanying number.\n");
+				}
+				if(optopt == 's'){
+					fprintf(stderr,"-s requires an accompanying number.\n");
+				} else{
+					fprintf(stderr, "Unknown option\n");
+				}
 				return 1;
 			default:
 				abort();
 		}
 	}
 
-	
+	if(strcmp(argv[3],"-n") == 0){
+		n = atoi(argv[4]);	
+		s = atoi(argv[2]);
+	}
+	else{
+		n = atoi(argv[2]);
+		s = atoi(argv[4]);
+	}
+	if(s > 20){
+		printf("Too many children. Defaulting to 20.\n");
+		s = 20;
+	}
 
 
 
