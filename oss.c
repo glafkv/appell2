@@ -4,17 +4,34 @@
 #include <sys/ipc.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <assert.h>
+#include <signal.h>
 
 #define SHSIZE 100
+
+int shm_id;
+void terminate(int sig){
+	printf("Control C was pressed. Press Control C again to terminate\n");
+	shmctl(shm_id, IPC_RMID, NULL);
+	(void)signal(SIGNT, SIG_DFL);
+}
 int main(int argc, char *argv[])
 {
-	int shmid;
 	key_t key;
 	char *shm;
 	char *s;
 	key = 9876;
+	pid_t childpid = 0; 
+	int i = 0, j = 0, shmid = 0, total = 0, done, n, s;
+	opterr = 0;
+	int arr[2];
 	shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
 	
+	
+	(void)signal(SIGNINT, terminate);
 	if(shmid < 0){
 		perror("shmget");
 		exit(1);
@@ -35,16 +52,16 @@ int main(int argc, char *argv[])
 	}
 	shmdt(shm);
 	shmctl(shmid, IPC_RMID, NULL);
-	//int choice = 0;
-	//char * n = NULL;
-	//char * s = NULL;	
+	int choice = 0;
+	char * n = NULL;
+	char * s = NULL;	
 	
 	
 	
 
 
 	
-	/*while((choice = getopt(argc, argv, "hn:s:i:o:")) != -1){
+	while((choice = getopt(argc, argv, "hn:s:i:o:")) != -1){
 		switch(choice){
 			case 'h':
 				printf("\tI'm here to help!\n");
@@ -67,7 +84,7 @@ int main(int argc, char *argv[])
 			default:
 				abort();
 		}
-	}*/
+	}
 
 	
 
