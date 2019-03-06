@@ -10,8 +10,10 @@
 #include <assert.h>
 #include <signal.h>
 
-#define SHSIZE 100
+#define shared_key 98765
 
+int shmid;
+char *shmaddr;
 int main(int argc, char *argv[])
 {
 
@@ -33,11 +35,7 @@ int main(int argc, char *argv[])
 	int choice = 0;
 	char * nval = NULL;
 	char * sval = NULL;	
-	//variables to allocate shared memory.
-	int shmid;
-	key_t key;
-	char *shm;
-	char *s;
+	
 	
 	
 	
@@ -78,39 +76,51 @@ int main(int argc, char *argv[])
 				abort();
 		}
 	}
-	if(argc < 4){
-		fprintf(stderr, "%s requires additional arguments\n", argv[0]);
-		return 1;
-	}
-	if(strcmp(argv[3], "-s" == 0)){
-		n = atoi(argv[2]);
-		s = atoi(argv[4]);	
-	}
-	else {
-		n = atoi(argv[4]);
-		s = atoi(argv[2]);
-	}
-	if(s > 20){
-		printf("Too many children. Now it's 20.");
-		s = 20;
-	}
+	//if(argc < 4){
+	//	fprintf(stderr, "%s requires additional arguments\n", argv[0]);
+	//	return 1;
+	//}
+
 		
-	key = 9876;
-	shmid = shmget(key, SHSIZE, IPC_CREAT | 0666);
-	if(shmid < 0){
+	char parameter1 [12];
+	char *ptr;
+	int array[3];
+	
+
+	//create shared memory
+	if((shmid = shmget(shared_key, 1024, IPC_CREAT | IPC_EXCL | 0666)) < 0){
 		perror("shmget: ");
 		exit(1);
 	}
-	shm = shmat(shmid, NULL, 0);
-	if(shm == (char *) -1){
-		perror("shmat: ");
-		exit(1);
+	//sprintf(parameter1, "%d", shmid);
+
+	//char parameter2 [n]; 
+	//sprintf(parameter2, "%d", n);
+	//Initialize and write to shared memory.
+	shmaddr = (char *) shmat (shmid, 0, 0); //get shared address
+	ptr = shmaddr + sizeof (array); //point to shared memory beginning
+	
+	array[0] = sprintf(ptr, "20000") + 1; //store 0 to array[0]
+	ptr += array[0]; //move pointer to next array element
+	
+	array[1] = sprintf(ptr, "0") + 1; //store num to array[1]
+	ptr += array[1]; //move pointer to next array element
+	
+	array[2] = sprintf(ptr, "64987") + 1;
+
+	
+	memcpy(shmaddr, &array, sizeof (array)); //stores the array in shared memore
+
+	sprintf(parameter1, "%d", shmid); //store shmid in param1 to pass through execlp
+
+	if(fork() == 0){
+		execlp("./user", "./user", parameter1, (char *)NULL);
+		fprintf(stderr, "Failed to exec to user\n");
 	}
 	
 
-
-
-
+	shmdt(shmaddr);
+	shmctl(shmid, IPC_RMID, NULL);
 fclose(infptr);
 fclose(outfptr);
 

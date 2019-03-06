@@ -8,53 +8,39 @@
 #include <sys/stat.h>
 
 #define shared_key 54321
+
+int shmid;
+char *shmaddr;
 int main(int argc, char *argv[]){
 	
+	char parameter1 [12]; //hold shmid for passing 
+	char *array[3];
+	char *ptr;
+	int *p;
+	int shared_memory[3]; //get the stuff from shared memory
+	int increment, seconds, nanoseconds;
 
-	int shmid, n, times = 0;
-	char * shmaddr, * ptr;
-	char * shared_memory[3];
-	int * p;
-	int value, seconds, milliseconds;
-	int array[2];
-	char store[4];
-	
 	shmid = atoi(argv[1]);
-	n = atoi(argv[2]);	
-	shmaddr = (char *) shmat (shmid, 0, 0);
+	shmaddr = (char *) shmat (shmid, 0, 0); //find shared memory
 	
-	printf("Working...\n");
-	
-	while(times < (n*1000000)){
-		ptr = shmaddr + sizeof (int) * 2;
+	//get info from shared memory
+		ptr = shmaddr + sizeof (shared_memory);
 		p = (int *)shmaddr;
-		shared_memory[0] = ptr;
+		array[0]=ptr;
 		ptr += *p++;
-		shared_memory[1] = ptr;
-		
-		seconds = atoi(shared_memory[0]);
-		milliseconds = atoi(shared_memory[1]);
+		array[1] = ptr;
+		ptr += *p++;
+		array[2]=ptr;
+		ptr += *p++;
 	
-		if(milliseconds > 998){
-			seconds += 1;
-			milliseconds = 0;
-		}
-		else {
-			milliseconds += 1;
-		}
-		ptr = shmaddr + sizeof (array);
-	
-		sprintf(store, "%d", seconds);	
-		array[0] = sprintf(ptr, store) + 1;
-		ptr += array[0];
+		increment = atoi(array[0]);
+		seconds = atoi(array[1]);
+		nanoseconds = atoi(array[2]);
 		
-		sprintf(store, "%d", milliseconds);
-		array[1] = sprintf(ptr, store) + 1;
-		
-		memcpy(shmaddr, &array, sizeof (array));
-		
-		times++;
-	}
-	shmdt(shmaddr);
+		printf("Seconds: %i\n", seconds);
+		printf("Nano: %i\n", nanoseconds);
 
+	
+
+return 0;
 }
